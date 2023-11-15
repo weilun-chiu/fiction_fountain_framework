@@ -33,6 +33,7 @@ class App extends Component {
         console.log(error);
       });
     window.addEventListener('scroll', this.handleScroll);
+    this.refreshList();
   }
 
   componentWillUnmount() {
@@ -50,6 +51,16 @@ class App extends Component {
   increaseReadingProgress = (fictionFountainId) => {
     axios
       .post(`/api/fiction_fountains/${fictionFountainId}/increase_reading_progress/`, {}, {headers: {
+        'X-CSRFToken': csrfToken,
+      },})
+      .then((res) => {
+        console.log('Reading progress increased successfully.');
+        // Call your refreshList method or update state as needed
+        this.refreshList();
+      })
+      .catch((err) => console.error('Error increasing reading progress:', err));
+    axios
+      .post(`/api/fiction_fountains/${fictionFountainId}/check_reading_progress/`, {}, {headers: {
         'X-CSRFToken': csrfToken,
       },})
       .then((res) => {
@@ -92,7 +103,6 @@ class App extends Component {
   };
 
   renderItems = () => {
-    this.refreshList();
     const newItems = this.state.fictionFountainList;
 
     return newItems.map((item) => (
