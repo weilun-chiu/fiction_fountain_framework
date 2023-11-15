@@ -40,11 +40,22 @@ class App extends Component {
     window.removeEventListener('scroll', this.handleScroll);
   }
 
+  lastExecutionTime = 0;
+
   handleScroll = () => {
     // Check if the user has scrolled to the bottom of the page
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-      // Call the function to increase reading progress or perform any other action
-      this.increaseReadingProgress(1); // Change the argument based on the actual fictionFountainId
+      // Get the current time
+      const currentTime = new Date().getTime();
+
+      // Check if the cooldown period (3 seconds in this case) has passed
+      if (currentTime - this.lastExecutionTime >= 3000) {
+        // Call the function to increase reading progress
+        this.increaseReadingProgress(1); // Change the argument based on the actual fictionFountainId
+
+        // Update the last execution time
+        this.lastExecutionTime = currentTime;
+      }
     }
   };
 

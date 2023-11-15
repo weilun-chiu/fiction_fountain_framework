@@ -35,12 +35,8 @@ class FictionFountainView(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def check_reading_progress(self, reqquest, pk=None):
         fiction_fountain = self.get_object()
-        print(f'check_reading_progress called with {fiction_fountain.reading_progress+1} <= {fiction_fountain.next_chapter_id}')
-        if fiction_fountain.reading_progress+1 <= fiction_fountain.next_chapter_id:
-            print('Trigger generation')
-            fiction_fountain.generate_chapter()
-            return Response({'generate_chapter': fiction_fountain.generate_chapter()}, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        generated_chapter = fiction_fountain.generate_chapter()
+        return Response({'generate_chapter': generated_chapter}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def reset_reading_progress(self, request, pk=None):

@@ -97,29 +97,32 @@ Optional: Keep the each chapter around 300 words and at most 3 events, [insert a
         return generated_settings
 
     def generate_chapter(self) -> str:
-        genre = self.genre
-        people = self.people
-        settings = self.settings
-        if not settings:
-            settings = self.generate_settings()
-        next_chapter_id = self.next_chapter_id
+        chapter = None
+        while self.reading_progress + 1 >= self.next_chapter_id:
 
-        role = f'You are a {genre} author. Your task is to write {genre} stories for {people} in a vivid and intriguing language.'
-        prompt = role + f'''
+            genre = self.genre
+            people = self.people
+            settings = self.settings
+            if not settings:
+                settings = self.generate_settings()
+            next_chapter_id = self.next_chapter_id
+
+            role = f'You are a {genre} author. Your task is to write {genre} stories for {people} in a vivid and intriguing language.'
+            prompt = role + f'''
 #### Setting ####
 
 {settings}'''
 
-        prompt_variation = ""
-        previous_outline = self.outlines
-        if previous_outline != "":
-            prompt += f'''
+            prompt_variation = ""
+            previous_outline = self.outlines
+            if previous_outline != "":
+                prompt += f'''
 #### Previous Chapters ####
 
 {previous_outline}
 '''
-            prompt_variation = " and Previous Chapters"
-        prompt += f'''
+                prompt_variation = " and Previous Chapters"
+            prompt += f'''
 #### Instruction ####
 
 Given the Setting{prompt_variation}, build the chapter {next_chapter_id} outline with following format, describe each event within 30 words:
@@ -129,13 +132,13 @@ Given the Setting{prompt_variation}, build the chapter {next_chapter_id} outline
 Chapter {next_chapter_id}
 event [event_id]: [short description]
 '''
-        chapter_outline = query_openai(prompt=prompt)
-        if chapter_outline is None:
-            return None
-        previous_outline += "\n" + chapter_outline
-        self.outlines = previous_outline
+            chapter_outline = query_openai(prompt=prompt)
+            if chapter_outline is None:
+                return None
+            previous_outline += "\n" + chapter_outline
+            self.outlines = previous_outline
 
-        prompt = f'''
+            prompt = f'''
 {role}
 #### setting ####
 {settings}
@@ -146,17 +149,17 @@ Write chapter {self.next_chapter_id} in depth and in great detail, in an intrigu
 Chapter {self.next_chapter_id} - [Chapter Title]
 [Chapter Content]
 '''
-        chapter = query_openai(prompt=prompt)
-        if chapter is None:
-            return None
-        chapter = chapter.splitlines()
-        chapter = [p.strip() for p in chapter if p.strip()]
+            chapter = query_openai(prompt=prompt)
+            if chapter is None:
+                return None
+            chapter = chapter.splitlines()
+            chapter = [p.strip() for p in chapter if p.strip()]
 
-        # Append to self.chapters
-        chapters_list = json.loads(self.chapters)
-        chapters_list.append(chapter)
-        self.chapters = json.dumps(chapters_list)
-        next_chapter_id += 1
-        self.next_chapter_id = next_chapter_id
-        self.save()
+            # Append to self.chapters
+            chapters_list = json.loads(self.chapters)
+            chapters_list.append(chapter)
+            self.chapters = json.dumps(chapters_list)
+            next_chapter_id += 1
+            self.next_chapter_id = next_chapter_id
+            self.save()
         return chapter
