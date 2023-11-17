@@ -1,0 +1,20 @@
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# React
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.eslintcache
+
+# Django
+db.sqlite3
+*.pyc
+__pycache__/
+*_initial.py
+
+# Node.js 
+*.pack
+*.pack.old
